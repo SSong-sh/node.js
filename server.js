@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
+app.set("view engine", "ejs");
 
 var db;
 MongoClient.connect(
@@ -55,4 +56,8 @@ app.post("/add", function (요청, 응답) {
       console.log("저장완료");
     }
   );
+});
+
+app.get("/list", function (요청, 응답) {
+  응답.render("list.ejs");
 });
