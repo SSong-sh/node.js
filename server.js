@@ -59,5 +59,11 @@ app.post("/add", function (요청, 응답) {
 });
 
 app.get("/list", function (요청, 응답) {
-  응답.render("list.ejs");
+  // 모든 데이터 꺼내는 공식
+  db.collection("post")
+    .find()
+    .toArray(function (에러, 결과) {
+      console.log(결과);
+      응답.render("list.ejs", { posts: 결과 });
+    });
 });
