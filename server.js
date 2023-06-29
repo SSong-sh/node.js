@@ -73,6 +73,16 @@ app.post("/add", function (요청, 응답) {
   );
 });
 
+app.delete("/delete", function (요청, 응답) {
+  console.log(요청.body);
+  요청.body._id = parseInt(요청.body._id);
+  //요청.body에 담겨온 게시물 번호를 가진 글을 db에서 찾아서 삭제해주세요
+  db.collection("post").deleteOne(요청.body, function (에러, 결과) {
+    console.log("삭제완료");
+    응답.status(200).send({ message: "성공했습니다" });
+  });
+});
+
 app.get("/list", function (요청, 응답) {
   // 모든 데이터 꺼내는 공식
   db.collection("post")
