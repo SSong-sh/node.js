@@ -15,12 +15,6 @@ MongoClient.connect(
     }
     db = client.db("todoapp");
 
-    db.collection("post").insertOne(
-      { 이름: "song", _id: 100 },
-      function (에러, 결과) {
-        console.log("저장완료");
-      }
-    );
     app.listen(8080, function () {
       console.log("listening on 8080");
     });
@@ -91,4 +85,14 @@ app.get("/list", function (요청, 응답) {
       console.log(결과);
       응답.render("list.ejs", { posts: 결과 });
     });
+});
+
+app.get("/detail/:id", function (요청, 응답) {
+  db.collection("post").findOne(
+    { _id: parseInt(요청.params.id) },
+    function (에러, 결과) {
+      console.log(결과);
+      응답.render("detail.ejs", { data: 결과 });
+    }
+  );
 });
