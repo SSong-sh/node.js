@@ -33,6 +33,15 @@ app.get("/write", function (요청, 응답) {
   응답.render("write.ejs");
 });
 
+app.get("/edit/:id", function (요청, 응답) {
+  db.collection("post").findOne(
+    { _id: parseInt(요청.params.id) },
+    function (에러, 결과) {
+      응답.render("edit.ejs", { post: 결과 });
+    }
+  );
+});
+
 app.get("/list", function (요청, 응답) {
   // 모든 데이터 꺼내는 공식
   db.collection("post")
