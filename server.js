@@ -5,6 +5,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 app.set("view engine", "ejs");
 
+app.use("/public", express.static("public"));
+
 var db;
 MongoClient.connect(
   "mongodb+srv://admin:qwer1234@cluster0.10arsak.mongodb.net/?retryWrites=true&w=majority",
@@ -22,22 +24,33 @@ MongoClient.connect(
   }
 );
 
-app.get("/pet", function (요청, 응답) {
-  응답.send("펫 용품 쇼핑할 수 있는 페이지입니다.");
-});
-/* 누군가가 /pet으로 방문하면 pet 관련된 안내문을 띄어주자 */
-
-app.get("/beauty", function (요청, 응답) {
-  응답.send("뷰티 용품을 쇼핑할 수 있는 페이지입니다.");
-});
-
 app.get("/", function (요청, 응답) {
-  응답.sendFile(__dirname + "/index.html");
+  응답.render("index.ejs");
 });
 // "/" 홈이라는 뜻
 
 app.get("/write", function (요청, 응답) {
-  응답.sendFile(__dirname + "/write.html");
+  응답.render("write.ejs");
+});
+
+app.get("/list", function (요청, 응답) {
+  // 모든 데이터 꺼내는 공식
+  db.collection("post")
+    .find()
+    .toArray(function (에러, 결과) {
+      console.log(결과);
+      응답.render("list.ejs", { posts: 결과 });
+    });
+});
+
+app.get("/detail/:id", function (요청, 응답) {
+  db.collection("post").findOne(
+    { _id: parseInt(요청.params.id) },
+    function (에러, 결과) {
+      console.log(결과);
+      응답.render("detail.ejs", { data: 결과 });
+    }
+  );
 });
 
 app.post("/add", function (요청, 응답) {
@@ -75,24 +88,4 @@ app.delete("/delete", function (요청, 응답) {
     console.log("삭제완료");
     응답.status(200).send({ message: "성공했습니다" });
   });
-});
-
-app.get("/list", function (요청, 응답) {
-  // 모든 데이터 꺼내는 공식
-  db.collection("post")
-    .find()
-    .toArray(function (에러, 결과) {
-      console.log(결과);
-      응답.render("list.ejs", { posts: 결과 });
-    });
-});
-
-app.get("/detail/:id", function (요청, 응답) {
-  db.collection("post").findOne(
-    { _id: parseInt(요청.params.id) },
-    function (에러, 결과) {
-      console.log(결과);
-      응답.render("detail.ejs", { data: 결과 });
-    }
-  );
 });
