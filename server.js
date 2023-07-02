@@ -121,3 +121,59 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.get("/login", function (요청, 응답) {
+  응답.render("login.ejs");
+});
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+    //로컬 방식으로 인증해주시고 회원인증 실패하면 /fail로 이동시켜주세요
+  }),
+  function (요청, 응답) {
+    응답.redirect("/");
+    //회원인증 성공하고 그러면 홈으로 보내주세요
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id",
+      passwordField: "pw",
+      //유저가 입력한 아이디/비번 항목이 뭔지 정의 (name 속성)
+      session: true, //로그인 후 세션을 저장할 것인지
+      passReqToCallback: false, //아이디, 비번 말고도 다른 정보 검증시
+    },
+    function (입력한아이디, 입력한비번, done) {
+      //아이디/비번 맞는지 DB와 비교
+      console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne(
+        { id: 입력한아이디 },
+        function (에러, 결과) {
+          if (에러) return done(에러);
+
+          if (!결과)
+            //결과에 아무것도 없을 때 =db에 아이디가 없으면
+            return done(null, false, { message: "존재하지않는 아이디요" });
+          if (입력한비번 == 결과.pw) {
+            //db에 아이디가 있으면, 입력한비번과 결과.pw 비교
+            return done(null, 결과); //done(서버에러,성공시사용자db데이터,에러메세지)
+          } else {
+            return done(null, false, { message: "비번틀렸어요" });
+          }
+        }
+      );
+    }
+  )
+);
+
+passport.serializeUser(function (user, done) {
+  //결과가 user로 들어감
+  done(null, user.id); //id를 이용해서 세션을 저장시키는 코드 (로그인성공시 발동)
+});
+
+passport.deserializeUser(function (아이디, done) {
+  done(null, {}); //이 세션 데이터를 가진 사람을 db에서 찾아주세요 (마이페이지 접속시 발동)
+});
