@@ -137,6 +137,20 @@ app.post(
   }
 );
 
+app.get("/mypage", 로그인했니, function (요청, 응답) {
+  console.log(요청.user);
+  응답.render("mypage.ejs", { 사용자: 요청.user });
+});
+
+function 로그인했니(요청, 응답, next) {
+  if (요청.user) {
+    //로그인 후 세션이 있으면 요청.user가 항상 있음
+    next(); //요청.user가 있으면 next() 통과
+  } else {
+    응답.send("로그인 안 하셨어요");
+  }
+}
+
 passport.use(
   new LocalStrategy(
     {
@@ -175,7 +189,10 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (아이디, done) {
-  done(null, {}); //이 세션 데이터를 가진 사람을 db에서 찾아주세요 (마이페이지 접속시 발동)
+  //로그인한 유저의 세션아이디를 바탕으로 개인정보를 db에서 찾는 역할
+  db.collection("login").findOne({ id: 아이디 }, function (에러, 결과) {
+    done(null, 결과); //이 세션 데이터를 가진 사람을 db에서 찾아주세요 (마이페이지 접속시 발동)
+  });
 });
 
 app.get("/fail", function (요청, 응답) {
