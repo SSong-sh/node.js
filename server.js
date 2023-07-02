@@ -177,3 +177,7 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (아이디, done) {
   done(null, {}); //이 세션 데이터를 가진 사람을 db에서 찾아주세요 (마이페이지 접속시 발동)
 });
+
+app.get("/fail", function (요청, 응답) {
+  응답.render("fail.ejs");
+});
