@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 const methodOverride = require("method-override");
@@ -10,21 +11,18 @@ app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
 
 var db;
-MongoClient.connect(
-  "mongodb+srv://admin:qwer1234@cluster0.10arsak.mongodb.net/?retryWrites=true&w=majority",
-  function (에러, client) {
-    //연결되면 할 일
-    if (에러) {
-      return console.log(에러);
-    }
-    db = client.db("todoapp");
-
-    app.listen(8080, function () {
-      console.log("listening on 8080");
-    });
-    /* 8080 port로 웹서버를 열고 잘 열리면 listeninf on 8080을 출력해주세요*/
+MongoClient.connect(process.env.DB_URL, function (에러, client) {
+  //연결되면 할 일
+  if (에러) {
+    return console.log(에러);
   }
-);
+  db = client.db("todoapp");
+
+  app.listen(process.env.PORT, function () {
+    console.log("listening on 8080");
+  });
+  /* 8080 port로 웹서버를 열고 잘 열리면 listeninf on 8080을 출력해주세요*/
+});
 
 app.get("/", function (요청, 응답) {
   응답.render("index.ejs");
