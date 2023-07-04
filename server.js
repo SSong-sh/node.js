@@ -196,3 +196,11 @@ passport.deserializeUser(function (아이디, done) {
 app.get("/fail", function (요청, 응답) {
   응답.render("fail.ejs");
 });
+
+app.get('/search', (요청, 응답)=>{
+  console.log(요청.query.value)
+  db.collection('post').find({제목 : 요청.query.value}).toArray((에러, 결과)=>{
+    console.log(결과)
+    응답.render("result.ejs")
+  })
+})
