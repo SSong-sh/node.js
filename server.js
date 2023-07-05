@@ -199,8 +199,10 @@ app.get("/fail", function (요청, 응답) {
 
 app.get('/search', (요청, 응답)=>{
   console.log(요청.query.value)
-  db.collection('post').find({제목 : 요청.query.value}).toArray((에러, 결과)=>{
+  db.collection('post').find({$text : {$search: 요청.query.value}}).toArray((에러, 결과)=>{
     console.log(결과)
     응답.render("search.ejs", { posts: 결과 })
   })
 })
+
+
