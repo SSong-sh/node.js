@@ -198,11 +198,30 @@ app.get("/fail", function (요청, 응답) {
 });
 
 app.get("/search", (요청, 응답) => {
-  console.log(요청.query.value);
+  var 검색조건 = [
+    {
+      $search: {
+        index: "titleSearch",
+        text: {
+          query: 요청.query.value,
+          path: "제목", // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        },
+      },
+    },
+  ];
+  console.log(요청.query);
   db.collection("post")
-    .find({ $text: { $search: 요청.query.value } })
+    .aggregate(검색조건)
     .toArray((에러, 결과) => {
       console.log(결과);
       응답.render("search.ejs", { posts: 결과 });
     });
+});
+
+app.get("/shop/shirts", function (요청, 응답) {
+  응답.send("셔츠 파는 페이지입니다.");
+});
+
+app.get("/shop/pants", function (요청, 응답) {
+  응답.send("바지 파는 페이지입니다.");
 });
