@@ -218,10 +218,5 @@ app.get("/search", (요청, 응답) => {
     });
 });
 
-app.get("/shop/shirts", function (요청, 응답) {
-  응답.send("셔츠 파는 페이지입니다.");
-});
-
-app.get("/shop/pants", function (요청, 응답) {
-  응답.send("바지 파는 페이지입니다.");
-});
+app.use("/shop", require("./routes/shop.js"));
+app.use("/board/sub", require("./routes/board.js"));
