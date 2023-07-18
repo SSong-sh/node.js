@@ -5,6 +5,7 @@ require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 const methodOverride = require("method-override");
+const { ObjectId } = require("mongodb");
 app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
@@ -285,7 +286,7 @@ app.get("/image/:imageName", function (요청, 응답) {
 app.post("/chatroom", function (요청, 응답) {
   var 저장할거 = {
     title: "무슨무슨채팅방",
-    member: [요청.body.당한사람id, 요청.user.id],
+    member: [ObjectId(요청.body.당한사람id), 요청.user._id],
     date: new Date(),
   };
 
