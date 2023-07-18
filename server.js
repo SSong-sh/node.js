@@ -296,3 +296,12 @@ app.post("/chatroom", function (요청, 응답) {
       응답.send("저장완료");
     });
 });
+
+app.get("/chat", 로그인했니, function (요청, 응답) {
+  db.collection("chatroom")
+    .find({ member: 요청.user._id })
+    .toArray()
+    .then((결과) => {
+      응답.render("chat.ejs", { data: 결과 });
+    });
+});
