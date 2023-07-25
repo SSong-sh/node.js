@@ -61,8 +61,15 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <script>
       var 지금누른채팅방id;
+      var eventSource;
       $(".list-group-item").click(function () {
         지금누른채팅방id = this.dataset.id;
+
+        // 유저가 데이터수신
+        eventSource = new EventSource("/message/" + 지금누른채팅방id);
+        eventSource.addEventListener("test", function (e) {
+          console.log(JSON.parse(e.data));
+        });
       });
 
       $("#send").click(function () {
