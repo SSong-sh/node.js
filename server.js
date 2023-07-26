@@ -34,6 +34,22 @@ app.get("/socket", function (요청, 응답) {
   응답.render("socket.ejs");
 });
 
+io.on("connection", function (socket) {
+  console.log("유저접속됨");
+
+  socket.on("room1-send", function (data) {
+    io.to("room1").emit("broadcast", data);
+  });
+
+  socket.on("joinroom", function (data) {
+    socket.join("room1"); //채팅방 생성
+  });
+
+  socket.on("user-send", function (data) {
+    io.emit("broadcast", data);
+  });
+}); // 누가 웹소켓에 접속하면 내부 코드 실행해주셈
+
 app.get("/", function (요청, 응답) {
   응답.render("index.ejs");
 });
