@@ -64,11 +64,23 @@
       var eventSource;
       $(".list-group-item").click(function () {
         지금누른채팅방id = this.dataset.id;
+        $(".chat-content").html("");
+
+        if (eventSource != undefined) {
+          eventSource.close(); //실시간 소통창 닫기
+        }
 
         // 유저가 데이터수신
         eventSource = new EventSource("/message/" + 지금누른채팅방id);
         eventSource.addEventListener("test", function (e) {
           console.log(JSON.parse(e.data));
+
+          var 가져온거 = JSON.parse(e.data); //서버가 보낸거 수신
+          가져온거.forEach((a) => {
+            $(".chat-content").append(
+              `<li><span class="chat-box">${a.content}</span></li>`
+            );
+          });
         });
       });
 

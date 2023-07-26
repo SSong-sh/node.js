@@ -1,5 +1,10 @@
 const express = require("express");
 const app = express();
+
+const http = require("http").createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(http);
+
 const bodyParser = require("body-parser");
 require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,10 +24,14 @@ MongoClient.connect(process.env.DB_URL, function (에러, client) {
   }
   db = client.db("todoapp");
 
-  app.listen(process.env.PORT, function () {
+  http.listen(process.env.PORT, function () {
     console.log("listening on 8080");
   });
   /* 8080 port로 웹서버를 열고 잘 열리면 listeninf on 8080을 출력해주세요*/
+});
+
+app.get("/socket", function (요청, 응답) {
+  응답.render("socket.ejs");
 });
 
 app.get("/", function (요청, 응답) {
@@ -324,14 +333,23 @@ app.get("/message/:id", 로그인했니, function (요청, 응답) {
   응답.writeHead(200, {
     Connection: "keep-alive",
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-cache", //실시간 소통채널 개설
   });
 
   db.collection("message")
-    .find({ parent: "요청.params.id" })
+    .find({ parent: 요청.params.id })
     .toArray()
     .then((결과) => {
-      응답.write("event: test\n");
-      응답.write("data: " + JSON.stringify(결과) + "\n\n");
+      응답.write("event: test\n"); //이벤트 이름
+      응답.write(`data: ${JSON.stringify(결과)}\n\n`); //문자열로 변환
     });
+
+  const pipeline = [{ $match: { "fullDocument.parent": 요청.params.id } }];
+  const collection = db.collection("message");
+  const changeStream = collection.watch(pipeline); //watch()를 붙이면 실시간 감시
+  changeStream.on("change", (result) => {
+    응답.write("event: test\n");
+    응답.write(`data: ${JSON.stringify([result.fullDocument])}\n\n`);
+    console.log(result.fullDocument);
+  }); //해당 컬랙션에 변동이 생기면 여기 코드 실행됨
 });
